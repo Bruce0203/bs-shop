@@ -26,13 +26,13 @@ repositories {
 extra["vaadinVersion"] = "24.0.0"
 
 dependencies {
-	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
-	implementation("org.springframework.boot:spring-boot-starter-data-rest")
+//	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+//	implementation("org.springframework.boot:spring-boot-starter-data-rest")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-	implementation("com.vaadin:vaadin-spring-boot-starter")
+//	implementation("com.vaadin:vaadin-spring-boot-starter")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.springframework.session:spring-session-core")
 	implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
