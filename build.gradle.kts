@@ -7,11 +7,18 @@ plugins {
 	id("com.vaadin") version "24.0.0"
 	kotlin("jvm") version "1.7.22"
 	kotlin("plugin.spring") version "1.7.22"
+	id("org.jetbrains.kotlin.plugin.noarg") version "1.7.22"
 }
 
 group = "io.github.bruce0203"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_17
+
+noArg {
+	annotations(
+		"lombok.NoArgsConstructor",
+	)
+}
 
 configurations {
 	compileOnly {
@@ -26,7 +33,7 @@ repositories {
 extra["vaadinVersion"] = "24.0.0"
 
 dependencies {
-//	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 //	implementation("org.springframework.boot:spring-boot-starter-data-rest")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
