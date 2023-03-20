@@ -1,4 +1,4 @@
-package io.github.bruce0203.watchmore
+package io.github.bruce0203.watchmore.handler
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

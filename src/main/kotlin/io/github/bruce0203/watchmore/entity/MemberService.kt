@@ -1,4 +1,4 @@
-package io.github.bruce0203.watchmore
+package io.github.bruce0203.watchmore.entity
 
 import lombok.AllArgsConstructor
 import org.bson.types.ObjectId
@@ -23,7 +23,7 @@ class MemberService : UserDetailsService {
     lateinit var memberRepository: MemberRepository
 
     @Transactional
-    fun joinUser(member: MemberEntity): ObjectId {
+    fun joinUser(member: Member): ObjectId {
         val passwordEncoder = BCryptPasswordEncoder()
         member.password = passwordEncoder.encode(member.password)
         return memberRepository.save(member).id

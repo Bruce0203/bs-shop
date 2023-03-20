@@ -1,5 +1,8 @@
-package io.github.bruce0203.watchmore
+package io.github.bruce0203.watchmore.handler
 
+import io.github.bruce0203.watchmore.entity.Member
+import io.github.bruce0203.watchmore.entity.MemberRepository
+import io.github.bruce0203.watchmore.entity.MemberService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -18,12 +21,12 @@ class SignUpController {
 
     @GetMapping("/signup")
     fun showSignup(model: Model): String {
-        model.addAttribute("user", MemberEntity(username="", password=""))
+        model.addAttribute("user", Member(username="", password=""))
         return "signup"
     }
 
     @PostMapping("/signup")
-    fun signup(@ModelAttribute("user") user: MemberEntity, result: BindingResult, model: Model): String {
+    fun signup(@ModelAttribute("user") user: Member, result: BindingResult, model: Model): String {
         val existingUser = memberRepository.findByUsername(user.username)
         return if (existingUser !== null && existingUser.username.isNotEmpty()) {
             result.rejectValue("username", "There is already an account registered with the same email")
