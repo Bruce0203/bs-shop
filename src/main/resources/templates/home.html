@@ -1,11 +1,22 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
 <head>
-    <title>Spring Security Example</title>
+    <title>watchmore</title>
 </head>
-<body>
-<h1>Welcome!</h1>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/mu/0.3.0/mu.min.css" />
+    <link rel="stylesheet" href="//unpkg.com/gutenberg-css" media="print" charset="utf-8">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/styles/default.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500&display=swap" rel="stylesheet">
+</head>
 
-<p>Click <a th:href="@{/hello}">here</a> to see a greeting.</p>
+<body>
+<h1>환영해요!</h1>
+
+<p>인사말을 보려면 <a th:href="@{/hello}">여기</a>를 클릭하십시오.</p>
 </body>
 </html>

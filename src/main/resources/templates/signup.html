@@ -1,23 +1,48 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
 <head>
-    <title>Spring Security Example </title>
+    <title>watchmore </title>
+</head>
+<style>
+    input {
+  border: none;
+  border-bottom: 2px solid #ccc;
+  outline: none;
+  font-size: 1.2rem;
+  padding: 5px 0;
+  transition: border-color 0.2s ease-in-out;
+}
+
+input:focus {
+  border-color: #6c63ff;
+}
+</style>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/mu/0.3.0/mu.min.css" />
+    <link rel="stylesheet" href="//unpkg.com/gutenberg-css" media="print" charset="utf-8">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/styles/default.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500&display=swap" rel="stylesheet">
 </head>
 <body>
-<h1>sign up</h1>
+<h1>회원가입</h1>
 <form
         th:action="@{/signup}"
         th:object="${user}"
         method="post">
-    <div><label> User Name : <input type="text" name="username" th:field="*{username}"/> </label></div>
-    <div><label> Password: <input type="password" name="password" th:field="*{password}"/> </label></div>
+    <div><label> 사용자 이름 : <input type="text" name="username" th:field="*{username}"/> </label></div>
+    <div><label> 비밀번호 : <input type="password" name="password" th:field="*{password}"/> </label></div>
     <div th:if="${param.error}">
-        Invalid username and password.
+        사용자 이름 및 암호가 잘못되었습니다.
     </div>
     <div th:if="${param.logout}">
-        You have been logged out.
+        로그아웃되었습니다.
     </div>
-    <div><input type="submit" value="Sign Up"/></div>
+    <div><input type="submit" value="회원가입"/></div>
 </form>
 </body>
 

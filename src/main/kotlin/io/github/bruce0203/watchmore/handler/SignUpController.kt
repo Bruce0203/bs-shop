@@ -26,14 +26,14 @@ class SignUpController {
     }
 
     @PostMapping("/signup")
-    fun signup(@ModelAttribute("user") user: Member, result: BindingResult, model: Model): String {
+    fun signup(@ModelAttribute("user") user: Member, result: BindingResult, model: Model): String? {
         val existingUser = memberRepository.findByUsername(user.username)
         return if (existingUser !== null && existingUser.username.isNotEmpty()) {
             result.rejectValue("username", "There is already an account registered with the same email")
-            "signup"
+            "redirect:/signup?error"
         } else {
             memberService.joinUser(user)
-            "home"
+            "redirect:/login"
         }
 
     }
