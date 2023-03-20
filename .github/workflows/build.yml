@@ -5,6 +5,7 @@ on:
       - main
 jobs:
   gradle:
+    permissions: write-all
     strategy:
       matrix:
         os: [ ubuntu-latest ]
