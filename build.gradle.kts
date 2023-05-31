@@ -33,6 +33,8 @@ repositories {
 extra["vaadinVersion"] = "24.0.0"
 
 dependencies {
+	implementation("org.springframework.security:spring-security-oauth2-client")
+	implementation("org.springframework.security:spring-security-oauth2-jose")
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 //	implementation("org.springframework.boot:spring-boot-starter-data-rest")
 	implementation("org.springframework.boot:spring-boot-starter-security")
@@ -65,4 +67,13 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+sourceSets {
+	main {
+		kotlin { srcDirs.add(File("src/main/java")) }
+	}
+	test {
+		kotlin { srcDirs.add(File("src/test/java")) }
+	}
 }

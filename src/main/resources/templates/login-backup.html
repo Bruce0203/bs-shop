@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <title>watchmore </title>
+</head>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/mu/0.3.0/mu.min.css" />
+    <link rel="stylesheet" href="//unpkg.com/gutenberg-css" media="print" charset="utf-8">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/styles/default.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500&display=swap" rel="stylesheet">
+</head>
+<style>
+    input {
+  border: none;
+  border-bottom: 2px solid #ccc;
+  outline: none;
+  font-size: 1.2rem;
+  padding: 5px 0;
+  transition: border-color 0.2s ease-in-out;
+}
+
+input:focus {
+  border-color: #6c63ff;
+}
+</style>
+<style>
+    .cute-button {
+  display: inline-block;
+  background-color: #4681f4;
+  color: #fff;
+  border: none;
+  border-radius: 25px;
+  padding: 5px 15px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: center;
+  text-transform: uppercase;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+.label {
+  color: #779977;
+
+}
+.cute-button:hover {
+  background-color: #4681f4;
+}
+
+.cute-button:active {
+  background-color: #4681f4;
+  box-shadow: none;
+}
+</style>
+<body>
+<h1>로그인</h1>
+<form th:action="@{/login}" method="post">
+    <div><label> 사용자 이름 : <input type="text" name="username"/> </label></div>
+    <div><label> 비밀번호 : <input type="password" name="password"/> </label></div>
+    <div th:if="${param.error}" style="color: #ff5252">
+        <small>사용자 이름 및 암호가 잘못되었습니다.</small>
+    </div>
+    <div>
+        <input  class="cute-button" type="submit" style="margin-top: 10px;" value="로그인"/>
+        <a href="/signup" style="margin-left: 12px;"><small>회원가입</small></a>
+    </div>
+</form>
+</body>
+
+</html>
