@@ -8,6 +8,23 @@ import io.ktor.server.routing.*
 
 val dotenv = dotenv()
 
-fun Application.main() {
+fun Application.mainModule() {
+    install(Authentication) {
+        bearer {
+            realm = "Access to the '/' path"
+            authenticate { tokenCredential ->
+                if (tokenCredential.token == "abc123") {
+                    UserIdPrincipal("jetbrains")
+                } else null
+            }
+        }
+    }
+    routing {
+        authenticate {
+            get("/") {
+                call.respondText("Hello, ${call.principal<UserIdPrincipal>()?.name}!")
+            }
+        }
+    }
 
 }

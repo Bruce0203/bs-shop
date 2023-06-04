@@ -70,10 +70,17 @@ kotlin {
                 implementation("io.ktor:ktor-client-cio:$ktor_version")
                 implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
                 implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
-
+                implementation("org.ktorm:ktorm-core:3.6.0")
+                implementation("org.ktorm:ktorm-support-oracle:3.6.0")
+                implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("ojdbc10.jar"))))
             }
         }
-        val jvmTest by getting
+        val jvmTest by getting {
+            dependencies {
+                implementation("io.ktor:ktor-server-test-host:$ktor_version")
+                implementation("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
+            }
+        }
         val jsMain by getting {
             dependencies {
                 implementation("org.jetbrains.kotlin-wrappers:kotlin-react:18.2.0-pre.467")
@@ -112,4 +119,8 @@ tasks.named<Copy>("jvmProcessResources") {
 tasks.named<JavaExec>("run") {
     dependsOn(tasks.named<Jar>("jvmJar"))
     classpath(tasks.named<Jar>("jvmJar"))
+}
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
 }
