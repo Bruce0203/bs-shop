@@ -1,6 +1,7 @@
-val ktor_version: String by project
-val kotlin_version: String by project
-
+val ktorVersion: String by project
+val kotlinVersion: String by project
+val exposedVersion: String by project
+val kotlinCssVersion: String by project
 plugins {
     kotlin("multiplatform") version "1.8.21"
     kotlin("plugin.serialization") version "1.8.21"
@@ -60,25 +61,29 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-                implementation("io.ktor:ktor-server-netty:$ktor_version")
-                implementation("io.ktor:ktor-server-html-builder-jvm:$ktor_version")
+                implementation("io.ktor:ktor-server-netty:$ktorVersion")
+                implementation("io.ktor:ktor-server-html-builder-jvm:$ktorVersion")
+                implementation("io.ktor:ktor-server-html-builder:$ktorVersion")
+                implementation("org.jetbrains.kotlin-wrappers:kotlin-css:$kotlinCssVersion")
+
                 implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.8.1")
-                implementation("io.ktor:ktor-server-auth:$ktor_version")
-                implementation("io.ktor:ktor-client-auth:$ktor_version")
-                implementation("io.ktor:ktor-server-core:$ktor_version")
+                implementation("io.ktor:ktor-server-auth:$ktorVersion")
+                implementation("io.ktor:ktor-client-auth:$ktorVersion")
+                implementation("io.ktor:ktor-server-core:$ktorVersion")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:+")
-                implementation("io.ktor:ktor-client-cio:$ktor_version")
-                implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
+                implementation("io.ktor:ktor-client-cio:$ktorVersion")
+                implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
                 implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
-                implementation("org.ktorm:ktorm-core:3.6.0")
-                implementation("org.ktorm:ktorm-support-oracle:3.6.0")
-                implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("ojdbc10.jar"))))
+                implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
+                implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
+                implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+                implementation("com.h2database:h2:2.1.214")
             }
         }
         val jvmTest by getting {
             dependencies {
-                implementation("io.ktor:ktor-server-test-host:$ktor_version")
-                implementation("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
+                implementation("io.ktor:ktor-server-test-host:$ktorVersion")
+                implementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
             }
         }
         val jsMain by getting {
@@ -91,15 +96,15 @@ kotlin {
         val jsTest by getting
         val nativeMain by getting {
             dependencies {
-                implementation("io.ktor:ktor-server-core:$ktor_version")
-                implementation("io.ktor:ktor-server-cio:$ktor_version")
+                implementation("io.ktor:ktor-server-core:$ktorVersion")
+                implementation("io.ktor:ktor-server-cio:$ktorVersion")
             }
 
         }
         val nativeTest by getting {
             dependencies {
                 implementation(kotlin("test"))
-                implementation("io.ktor:ktor-server-test-host:$ktor_version")
+                implementation("io.ktor:ktor-server-test-host:$ktorVersion")
             }
         }
 
