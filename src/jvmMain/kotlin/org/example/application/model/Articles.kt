@@ -1,18 +1,16 @@
-package org.example.application
+package org.example.application.model
 
-import io.ktor.http.*
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 
 object Articles: IntIdTable() {
     val name = varchar("name", 50)
-    val contents = varchar("contents", 25565)
+    val contents = varchar("contents", Int.MAX_VALUE)
+    init { transaction { SchemaUtils.create(this@Articles) } }
 }
 
 class Article(id: EntityID<Int>) : IntEntity(id) {
@@ -20,6 +18,3 @@ class Article(id: EntityID<Int>) : IntEntity(id) {
     var name by Articles.name
     var contents by Articles.contents
 }
-
-@Serializable
-data class ArticleDTO(val name: String, val contents: String)

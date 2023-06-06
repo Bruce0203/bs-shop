@@ -1,16 +1,19 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.distsDirectory
+
 val ktorVersion: String by project
 val kotlinVersion: String by project
 val exposedVersion: String by project
 val kotlinCssVersion: String by project
+val fritz2Version: String by project
 plugins {
-    kotlin("multiplatform") version "1.8.21"
-    kotlin("plugin.serialization") version "1.8.21"
+    kotlin("multiplatform") version "1.8.0"
+    kotlin("plugin.serialization") version "1.8.0"
     application
     id("com.github.johnrengelman.shadow") version "7.1.2"
-
+    id("com.google.devtools.ksp") version "1.8.0-1.0.9"
 }
 
-group = "org.example"
+group = "io.github.bruce0203.baekshinshop"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -28,8 +31,8 @@ kotlin {
         }
     }
     js(IR) {
-        binaries.executable()
         browser {
+            binaries.executable()
             commonWebpackConfig {
                 cssSupport {
                     enabled.set(true)
@@ -37,25 +40,15 @@ kotlin {
             }
         }
     }
-    val hostOs = System.getProperty("os.name")
-    val arch = System.getProperty("os.arch")
-    val nativeTarget = when {
-        hostOs == "Mac OS X" && arch == "x86_64" -> macosX64("native")
-        hostOs == "Mac OS X" && arch == "aarch64" -> macosArm64("native")
-        hostOs == "Linux" -> linuxX64("native")
-        // Other supported targets are listed here: https://ktor.io/docs/native-server.html#targets
-        else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
-    }
-
-    nativeTarget.apply {
-        binaries {
-            executable {
-                entryPoint = "main"
+    sourceSets {
+        val commonMain by getting {
+            repositories {
+                mavenCentral()
+            }
+            dependencies {
+                implementation("dev.fritz2:core:$fritz2Version")
             }
         }
-    }
-    sourceSets {
-        val commonMain by getting
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
@@ -79,6 +72,7 @@ kotlin {
                 implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
                 implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
                 implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+                implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
                 implementation("com.h2database:h2:2.1.214")
             }
         }
@@ -96,20 +90,6 @@ kotlin {
             }
         }
         val jsTest by getting
-        val nativeMain by getting {
-            dependencies {
-                implementation("io.ktor:ktor-server-core:$ktorVersion")
-                implementation("io.ktor:ktor-server-cio:$ktorVersion")
-            }
-
-        }
-        val nativeTest by getting {
-            dependencies {
-                implementation(kotlin("test"))
-                implementation("io.ktor:ktor-server-test-host:$ktorVersion")
-            }
-        }
-
     }
 }
 
@@ -123,6 +103,12 @@ tasks.named<Copy>("jvmProcessResources") {
     from(jsBrowserDistribution)
 }
 
+tasks.named<Copy>("jsProcessResources") {
+    filesMatching("**/index.html") {
+        expand("project" to project.name)
+    }
+}
+
 tasks.named<JavaExec>("run") {
     dependsOn(tasks.named<Jar>("jvmJar"))
     classpath(tasks.named<Jar>("jvmJar"))
@@ -130,4 +116,15 @@ tasks.named<JavaExec>("run") {
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+}
+
+dependencies {
+    ksp("dev.fritz2:lenses-annotation-processor:$fritz2Version")
+}
+
+dependencies {
+    add("kspCommonMainMetadata", "dev.fritz2:lenses-annotation-processor:$fritz2Version")
+}
+tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().all {
+    if (name != "kspCommonMainKotlinMetadata") dependsOn("kspCommonMainKotlinMetadata")
 }

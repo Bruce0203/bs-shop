@@ -1,8 +1,7 @@
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import org.example.application.databaseModule
+import org.example.application.model.databaseModule
 import org.example.application.mainModule
 import kotlin.test.assertEquals
 import kotlin.test.*

@@ -5,5 +5,5 @@ pluginManagement {
     }
     
 }
-rootProject.name = "bs-shop"
+rootProject.name = "app"
 

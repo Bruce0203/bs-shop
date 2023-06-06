@@ -5,6 +5,7 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import kotlinx.css.*
 import kotlinx.html.*
+import org.example.application.model.Article
 import org.jetbrains.exposed.sql.transactions.transaction
 
 internal fun HEAD.styleCss() {
