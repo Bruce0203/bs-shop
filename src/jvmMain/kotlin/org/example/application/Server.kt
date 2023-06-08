@@ -6,7 +6,7 @@ import org.example.application.model.databaseModule
 
 fun main() { startsServer() }
 
-fun startsServer() = embeddedServer(Netty, port = 80) {
+fun startsServer() = embeddedServer(Netty, port = dotenv.get("PORT").toInt()) {
     databaseModule()
     mainModule()
 
