@@ -1,6 +1,5 @@
 package org.example.application
 
-import io.github.cdimascio.dotenv.dotenv
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -21,8 +20,6 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.util.*
 import kotlin.time.Duration.Companion.minutes
 
 fun Application.mainModule() {
