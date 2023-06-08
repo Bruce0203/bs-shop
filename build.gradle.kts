@@ -63,6 +63,8 @@ kotlin {
 
                 implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.8.1")
                 implementation("io.ktor:ktor-server-auth:$ktorVersion")
+                implementation("io.ktor:ktor-server-sessions:$ktorVersion")
+                implementation("io.ktor:ktor-server-cors:$ktorVersion")
                 implementation("io.ktor:ktor-client-auth:$ktorVersion")
                 implementation("io.ktor:ktor-server-core:$ktorVersion")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:+")

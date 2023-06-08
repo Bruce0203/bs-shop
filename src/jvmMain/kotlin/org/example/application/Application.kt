@@ -1,62 +1,127 @@
 package org.example.application
 
 import io.github.cdimascio.dotenv.dotenv
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.html.*
 import io.ktor.server.http.content.*
+import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.css.body
-import kotlinx.css.h1
-import kotlinx.css.script
-import kotlinx.html.body
-import kotlinx.html.h1
-import kotlinx.html.head
-import kotlinx.html.script
+import io.ktor.server.sessions.*
+import io.ktor.util.*
 import org.example.application.model.Article
-import org.example.application.model.Session
-import org.example.application.model.Sessions
 import org.example.application.model.User
+import org.example.application.model.Users
+import org.example.application.template.*
+import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.io.File
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.*
+import kotlin.time.Duration.Companion.minutes
 
 val dotenv = dotenv()
 
+data class UserSession(val name: String, val id: Int) : Principal
+fun User.toSession() = UserSession(username, id.value)
+
 fun Application.mainModule() {
+    install(Sessions) {
+        cookie<UserSession>("token", SessionStorageMemory()) {
+            cookie.path = "/"
+            cookie.maxAge = 10.minutes
+            transform(SessionTransportTransformerEncrypt(
+                hex(dotenv.get("secretEncryptKey")), hex(dotenv.get("secretSignKey"))
+            ))
+        }
+    }
+    install(CORS) {
+        allowHeader("token")
+        exposeHeader("token")
+    }
     install(Authentication) {
-        bearer {
-            realm = "Access to the '/' path"
-            authenticate { credential ->
-                transaction {
-                    Session.find { Sessions.token eq credential.token }.firstOrNull()
-                        ?.user?.let { User[it] }
-                        ?.run { UserIdPrincipal(username) }
-                }
+        session<UserSession>() {
+            validate { session ->
+                session
+            }
+            challenge {
+                call.respondRedirect("/login")
             }
         }
     }
     routing {
-        get("app.js") {
-            call.resolveResource("app.js")?.let { call.respond(it) }
+        get("style.css") { call.respondCss { styleCss() } }
+        get("editor.js") { call.resolveResource("editor.js")?.also { call.respond(it) } }
+        get("logout") {
+            call.sessions.clear("token")
+            call.respondRedirect("/")
         }
-        get {
-            call.resolveResource("index.html")?.let { call.respond(it) }
-        }
-        get("/login") {
-            call.respondHtml { login() }
-        }
-        route("articles") {
-            get {
-                call.respondHtml { articles() }
+        route("login") {
+            get { call.login() }
+            post {
+                    val user = call.receiveParameters().let { param ->
+                        UserPasswordCredential(
+                            param["username"] ?: throw Throwable(),
+                            param["password"] ?: throw Throwable()
+                        )
+                    }.run {
+                        transaction {
+                            User.find((Users.username eq name) and (Users.password eq password)).firstOrNull()
+                        }
+                    }?: throw Throwable().also { call.respondRedirect("/login?error") }
+                    call.sessions.set(user.toSession())
+                    call.respondRedirect("/")
+
             }
+        }
+        route("signup") {
+            get { call.signup() }
+            post {
+                val user = call.receiveParameters().let { param ->
+                    UserPasswordCredential(
+                        param["username"] ?: throw Throwable(),
+                        param["password"] ?: throw Throwable()
+                    ).also {
+                        if (
+                            !((3..15).contains(it.name.length)
+                                    && (3..15).contains(it.password.length))
+                            && !Regex("^[a-zA-Z0-9](_(?!(\\.|_))|\\.(?!(_|\\.))|[a-zA-Z0-9]){6,18}[a-zA-Z0-9]\$")
+                                .matches(it.name)) {
+                            throw Throwable().also { call.respondRedirect("/signup?error") }
+                        }
+                    }
+                }.let { user ->
+                    transaction {
+                        User.find(Users.username eq user.name).firstOrNull()
+                            ?.also { call.response.status(HttpStatusCode.Unauthorized) }
+                            ?: run {
+                                User.new {
+                                    username = user.name
+                                    password = user.password
+                                }
+                            }
+                    }
+                }
+                call.sessions.set(user.toSession())
+                call.respondRedirect("/")
+            }
+        }
+        get { call.respondRedirect("articles") }
+        route("articles") {
+            get { call.respondHtml { articles(); } }
             get("{id}") {
-                call.respondHtml { article(Article[call.request.uri.toInt()]) }
+                val user = call.sessions.get<UserSession>()?.id
+                call.respondHtml { article(user, transaction { Article[call.parameters["id"]!!.toInt()] }) }
             }
             authenticate {
                 get("new") {
-                    call.respondHtml { articleEditor() }
+                    val user = call.sessions.get<UserSession>()
+                    call.respondHtml { articleEditor(user?.name) }
                 }
                 post {
                     call.receiveParameters().let { param ->
@@ -64,18 +129,20 @@ fun Application.mainModule() {
                             Article.new {
                                 name = param["name"]!!
                                 contents = param["contents"]!!
+                                author = EntityID(call.sessions.get<UserSession>()!!.id, Users)
+                                created = LocalDate.now()
                             }
                         }
                     }
                     call.respondRedirect("/articles")
                 }
-                get("{id}/edit") {
-                    call.respondHtml { articleEditor(Article[call.request.uri.toInt()]) }
+                get("edit/{id}") {
+                    val user = call.sessions.get<UserSession>()
+                    val article = transaction { Article[call.parameters["id"]!!.toInt()] }
+                    call.respondHtml { articleEditor(user?.name, article) }
                 }
-                post("/delete") {
-                    call.receiveParameters().let { param ->
-                        transaction { param["id"]?.also { Article[it.toInt()].delete() } }
-                    }
+                post("delete/{id}") {
+                    transaction { Article[call.parameters["id"]!!.toInt()].delete() }
                     call.respondRedirect("/articles")
                 }
                 post("{id}") {
@@ -89,10 +156,6 @@ fun Application.mainModule() {
                     }
                     call.respondRedirect("/articles")
                 }
-            }
-            get("style.css") {
-                println("A")
-                call.respondCss { styleCss() }
             }
         }
     }
