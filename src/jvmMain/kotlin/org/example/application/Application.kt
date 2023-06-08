@@ -90,8 +90,10 @@ fun Application.mainModule() {
                         if (
                             !((3..15).contains(it.name.length)
                                     && (3..15).contains(it.password.length))
+                            && it.name.contains(" ").not()
+                            && it.password.contains(" ").not()
                             && !Regex("^[a-zA-Z0-9](_(?!(\\.|_))|\\.(?!(_|\\.))|[a-zA-Z0-9]){6,18}[a-zA-Z0-9]\$")
-                                .matches(it.name)) {
+                                .containsMatchIn(it.name)) {
                             throw Throwable().also { call.respondRedirect("/signup?error") }
                         }
                     }
