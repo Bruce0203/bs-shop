@@ -88,12 +88,13 @@ fun Application.mainModule() {
                         param["password"] ?: throw Throwable()
                     ).also {
                         if (
-                            !((3..15).contains(it.name.length)
-                                    && (3..15).contains(it.password.length))
-                            && it.name.contains(" ").not()
-                            && it.password.contains(" ").not()
-                            && !Regex("^[a-zA-Z0-9](_(?!(\\.|_))|\\.(?!(_|\\.))|[a-zA-Z0-9]){6,18}[a-zA-Z0-9]\$")
-                                .containsMatchIn(it.name)) {
+                            !(3..15).contains(it.name.length)
+                            || !(3..15).contains(it.password.length)
+                            || it.name.contains(" ")
+                            || it.password.contains(" ")
+                            || !Regex("^[a-zA-Z0-9](_(?!(\\.|_))|\\.(?!(_|\\.))|[a-zA-Z0-9]){6,18}[a-zA-Z0-9]\$")
+                                .containsMatchIn(it.name)
+                        ) {
                             throw Throwable().also { call.respondRedirect("/signup?error") }
                         }
                     }
