@@ -3,3 +3,4 @@ build
 .gradle
 .env
 kotlin-js-store
+ssh.sh

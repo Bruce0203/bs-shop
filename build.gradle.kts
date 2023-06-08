@@ -130,3 +130,8 @@ dependencies {
 tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().all {
     if (name != "kspCommonMainKotlinMetadata") dependsOn("kspCommonMainKotlinMetadata")
 }
+
+tasks.shadowJar {
+    archiveFileName.set("${project.name}.jar")
+    archiveVersion.set("")
+}
