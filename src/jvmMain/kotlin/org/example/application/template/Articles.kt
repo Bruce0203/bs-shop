@@ -30,9 +30,9 @@ fun HTML.articles() {
                     h2(classes = "no-top vertical inline-block") { +article.name }
                     pre(classes = "no-top right vertical inline-block") {
                         cite {
-                            +transaction { User[article.author].username }
-                            +"\n"
                             +article.created.format(DateTimeFormatter.ofPattern("YYYY.MM.dd"))
+                            +"\n"
+                            +transaction { User[article.author].username }
                         }
                     }
                     br
@@ -49,20 +49,19 @@ fun HTML.articleEditor(username: String?, article: Article? = null) {
     head { styleCss() }
     body {
         h1 { +"글쓰기" }
-        form(
-            action = "/articles",
-            method = FormMethod.post
-        ) {
+        postForm(action = if (article === null) "/articles" else "/articles/${article.id}") {
+            name = "editor"
             textInput(classes = "inline-block vertical", name = "name") {
                 value = article?.name ?: username?.let { "${it}님의 글" } ?: ""
                 placeholder = "제목"
                 required = true
             }
-            submitInput(classes = "inline-block vertical") {
-                value = "게시"
-            }
-            textInput(classes = "height text-right-top", name = "contents") {
-                value = article?.contents ?: ""
+            postButton(classes = "inline-block vertical") { +"게시" }
+            textArea {
+                wrap = TextAreaWrap.hard
+                name = "contents"
+                cols = "30"
+//                +(article?.contents ?: "")
                 placeholder = "내용"
                 required = true
             }

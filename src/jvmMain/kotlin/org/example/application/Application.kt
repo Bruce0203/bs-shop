@@ -95,19 +95,21 @@ fun Application.mainModule() {
                             || !Regex("^[a-zA-Z0-9](_(?!(\\.|_))|\\.(?!(_|\\.))|[a-zA-Z0-9]){6,18}[a-zA-Z0-9]\$")
                                 .containsMatchIn(it.name)
                         ) {
-                            throw Throwable().also { call.respondRedirect("/signup?error") }
+                            throw Throwable().also {
+                                call.respondRedirect("/signup?error=${HttpStatusCode.BadRequest.value}")
+                            }
                         }
                     }
                 }.let { user ->
+                    if (transaction { User.find(Users.username eq user.name).firstOrNull() } !== null) {
+                        call.respondRedirect("/signup?error=${HttpStatusCode.Conflict.value}")
+                        throw Throwable()
+                    }
                     transaction {
-                        User.find(Users.username eq user.name).firstOrNull()
-                            ?.also { call.response.status(HttpStatusCode.Unauthorized) }
-                            ?: run {
-                                User.new {
-                                    username = user.name
-                                    password = user.password
-                                }
-                            }
+                        User.new {
+                            username = user.name
+                            password = user.password
+                        }
                     }
                 }
                 call.sessions.set(user.toSession())
@@ -151,7 +153,7 @@ fun Application.mainModule() {
                 post("{id}") {
                     call.receiveParameters().let { param ->
                         transaction {
-                            Article[call.request.uri.toInt()].apply {
+                            Article[call.parameters["id"]?.toInt()!!].apply {
                                 param["name"]?.also { name = it }
                                 param["contents"]?.also { contents = it }
                             }

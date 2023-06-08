@@ -53,6 +53,10 @@ fun CssBuilder.styleCss() {
     rule("text-align-right") {
         textAlign = TextAlign.end
     }
+    rule("word") {
+        wordWrap = WordWrap.breakWord
+        wordBreak = WordBreak.breakWord
+    }
 
 }
 
