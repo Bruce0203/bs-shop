@@ -27,7 +27,7 @@ jobs:
 
       - run: git tag ${{github.run_number}}
       - name: Execute Gradle build
-        run: ./gradlew :plugin:shadowJar
+        run: ./gradlew :shadowJar
 
       - name: release
         uses: marvinpinto/action-automatic-releases@latest
