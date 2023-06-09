@@ -59,17 +59,20 @@ suspend fun ApplicationCall.signup() = respondHtml {
                         required = true
                     }
                 }
-                pre {
-                    cite {
-                        when (parameters["error"]?.toInt()?.let { HttpStatusCode.fromValue(it) }) {
-                            HttpStatusCode.BadRequest -> {
-                                +"아이디와 비밀번호의 길이는 3자 이상 15자 이하여야 합니다"
-                                +"아이디는 알파벳 소문자, 숫자, '-', '_', '.' 문자만 사용할 수 있습니다"
-                            }
-                            HttpStatusCode.Conflict -> { +"이미 사용중인 아이디입니다. 다른 아이디를 입력해주세요" }
-                            else -> br
+                when (parameters["error"]?.toInt()?.let { HttpStatusCode.fromValue(it) }) {
+                    HttpStatusCode.BadRequest -> pre {
+                        cite {
+                            +"아이디와 비밀번호의 길이는 3자 이상 15자 이하여야 합니다"
+                            +"아이디는 알파벳 소문자, 숫자, '-', '_', '.' 문자만 사용할 수 있습니다"
                         }
                     }
+
+                    HttpStatusCode.Conflict -> pre {
+                        cite {
+                            +"이미 사용중인 아이디입니다. 다른 아이디를 입력해주세요"
+                        }
+                    }
+                    else -> br
                 }
                 a("/login", classes = "inline-block vertical gap") {
                     +"로그인"

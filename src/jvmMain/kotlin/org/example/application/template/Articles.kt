@@ -3,9 +3,7 @@ package org.example.application.template
 import kotlinx.html.*
 import org.example.application.model.Article
 import org.example.application.model.User
-import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 
 const val serviceName = "그냥 게시판"

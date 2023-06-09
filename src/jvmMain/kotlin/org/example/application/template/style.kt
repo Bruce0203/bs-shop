@@ -8,6 +8,7 @@ import kotlinx.css.Float
 import kotlinx.css.properties.TextDecoration
 import kotlinx.html.HEAD
 import kotlinx.html.link
+import kotlinx.html.meta
 
 fun CssBuilder.styleCss() {
     rule(".auto-width") { width = LinearDimension.auto }
@@ -63,6 +64,7 @@ fun CssBuilder.styleCss() {
 internal fun HEAD.styleCss() {
     link { rel = "stylesheet"; href = "https://cdn.jsdelivr.net/npm/water.css@2/out/water.css" }
     link { rel = "stylesheet"; href = "/style.css" }
+    meta { name = "viewport"; content = "width=device-width, initial-scale=1.0" }
 }
 
 suspend inline fun ApplicationCall.respondCss(builder: CssBuilder.() -> Unit) {
