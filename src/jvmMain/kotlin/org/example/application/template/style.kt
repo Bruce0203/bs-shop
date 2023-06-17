@@ -58,6 +58,10 @@ fun CssBuilder.styleCss() {
         wordWrap = WordWrap.breakWord
         wordBreak = WordBreak.breakWord
     }
+    rule("no-step") {
+        paddingBottom = 0.pct
+        paddingTop = 0.pct
+    }
 
 }
 

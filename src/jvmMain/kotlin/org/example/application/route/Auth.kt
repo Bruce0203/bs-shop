@@ -1,80 +1,53 @@
 package org.example.application.route
 
-import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import io.ktor.server.request.*
+import io.ktor.server.auth.form
+import io.ktor.server.html.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
-import org.example.application.model.User
-import org.example.application.model.Users
-import org.example.application.template.login
-import org.example.application.template.signup
-import org.example.application.toSession
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.transactions.transaction
+import kotlinx.html.*
+import org.example.application.*
+import org.example.application.template.styleCss
 
 fun Routing.routeAuth() {
-    get("logout") {
-        call.sessions.clear("token")
-        call.respondRedirect("/")
-    }
-    route("login") {
-        get { call.login() }
-        post {
-            val user = call.receiveParameters().let { param ->
-                UserPasswordCredential(
-                    param["username"] ?: throw Throwable(),
-                    param["password"] ?: throw Throwable()
-                )
-            }.run {
-                transaction {
-                    User.find((Users.username eq name) and (Users.password eq password)).firstOrNull()
-                }
-            }?: throw Throwable().also { call.respondRedirect("/login?error") }
-            call.sessions.set(user.toSession())
-            call.respondRedirect("/")
-
-        }
-    }
-    route("signup") {
-        get { call.signup() }
-        post {
-            val user = call.receiveParameters().let { param ->
-                UserPasswordCredential(
-                    param["username"] ?: throw Throwable(),
-                    param["password"] ?: throw Throwable()
-                ).also {
-                    if (
-                        !(3..15).contains(it.name.length)
-                        || !(3..15).contains(it.password.length)
-                        || it.name.contains(" ")
-                        || it.password.contains(" ")
-                        || !Regex("^[a-zA-Z0-9](_(?!(\\.|_))|\\.(?!(_|\\.))|[a-zA-Z0-9]){6,18}[a-zA-Z0-9]\$")
-                            .containsMatchIn(it.name)
-                    ) {
-                        throw Throwable().also {
-                            call.respondRedirect("/signup?error=${HttpStatusCode.BadRequest.value}")
+    authenticate {
+        get("/login") {}
+        get("/callback") {
+            try {
+                val principal: OAuthAccessTokenResponse.OAuth2? = call.principal()
+                val emailIP = dotenv.get("EMAIL_IP")
+                val authSession = AuthSession(principal!!.state!!, principal.accessToken)
+                val userInfo = authSession.getUserInfo()
+                if (userInfo.email.endsWith(emailIP)) {
+                    call.sessions.set(authSession)
+                    call.authenticateUser()
+                    val redirect = redirects[principal.state!!]
+                    call.respondRedirect(redirect!!)
+                } else {
+                    call.respondHtml {
+                        head { styleCss() }
+                        body {
+                            div("center") {
+                                pre { p { +"백신고등학교 핵생용 이매일로만 로그인 할 수 있습니다" } }
+                                form(action = "/logout") {
+                                    getButton { +"다시 로그인하기" }
+                                }
+                            }
                         }
                     }
-                }
-            }.let { user ->
-                if (transaction { User.find(Users.username eq user.name).firstOrNull() } !== null) {
-                    call.respondRedirect("/signup?error=${HttpStatusCode.Conflict.value}")
                     throw Throwable()
                 }
-                transaction {
-                    User.new {
-                        username = user.name
-                        password = user.password
-                    }
-                }
+
+            } catch(e: Throwable) {
+                e.printStackTrace()
             }
-            call.sessions.set(user.toSession())
-            call.respondRedirect("/")
         }
     }
-
+    get("/logout") {
+        call.sessions.clear("userSession")
+        call.sessions.clear("authSession")
+        call.respondRedirect("/")
+    }
 }

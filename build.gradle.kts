@@ -70,6 +70,7 @@ kotlin {
                 implementation("io.ktor:ktor-serialization-kotlinx-json:+")
                 implementation("io.ktor:ktor-client-cio:$ktorVersion")
                 implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+                implementation("io.ktor:ktor-network-tls-certificates:$ktorVersion")
                 implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
                 implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
                 implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
